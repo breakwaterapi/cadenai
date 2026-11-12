@@ -2,7 +2,6 @@ from pydantic import BaseModel
 from typing import List, Tuple
 from enum import Enum
 import tiktoken
-from mistralai.models.chat_completion import ChatMessage as MistralChatMessage
 
 from ..schema import BasePromptTemplate
 
@@ -74,7 +73,7 @@ class MessageTemplate(BaseModel, BasePromptTemplate) :
             case prompt_syntax.OPENAI : 
                 return {"role" : self.role.openai, "content" : self.content.format(**kwargs)}
             case prompt_syntax.MISTRAL :
-                return MistralChatMessage(role=self.role.mistral, content=self.content.format(**kwargs))
+                return {"role" : self.role.mistral, "content" : self.content.format(**kwargs)}
             case prompt_syntax.CADENAI :
                 return (self.role.cadenai,self.content.format(**kwargs))
     

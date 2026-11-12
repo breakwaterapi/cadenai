@@ -1,6 +1,6 @@
 from ...schema import LLM
 
-from mistralai.client import MistralClient
+from mistralai.client import Mistral
 import os
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
@@ -15,7 +15,7 @@ class ChatMistral(LLM):
                  ):
         self.model = model
         self.temperature = temperature #Can't go upper than 1
-        self.client = MistralClient(api_key=os.getenv("MISTRAL_API_KEY"))
+        self.client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
         self._prompt_syntax = "mistral"
 
     @retry(wait=wait_exponential(multiplier=1, min=2, max=4))
@@ -28,7 +28,7 @@ class ChatMistral(LLM):
             return self._get_completion_without_stream(prompt=prompt, max_tokens=max_tokens) 
     
     def _get_completion_without_stream(self, prompt : List, max_tokens : int = 2500) -> str:
-        completion = self.client.chat(
+        completion = self.client.chat.complete(
         model=self.model,
         temperature = self.temperature,
         messages=prompt,
@@ -39,7 +39,7 @@ class ChatMistral(LLM):
     
     def _get_completion_stream(self, prompt : List, max_tokens : int = 2500) -> str:
         
-        completion = self.client.chat_stream(
+        completion = self.client.chat.stream(
         model=self.model,
         temperature = self.temperature,
         messages=prompt,
@@ -47,5 +47,5 @@ class ChatMistral(LLM):
         )
 
         for chunk in completion:
-            yield chunk.choices[0].delta.content
+            yield chunk.data.choices[0].delta.content
 
