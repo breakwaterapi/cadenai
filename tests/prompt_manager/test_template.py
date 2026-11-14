@@ -1,8 +1,6 @@
 import pytest
 from cadenai.prompt_manager.template import PromptTemplate, MessageTemplate, ChatPromptTemplate, Role
 
-from mistralai.models.chat_completion import ChatMessage as MistralChatMessage
-
 def test_prompt_template_formatting():
     pt = PromptTemplate(input_variables=["name"], template="Hello, {name}!")
     assert pt.format(name="John") == "Hello, John!"
@@ -19,7 +17,7 @@ def test_message_template_formatting_openai():
 
 def test_message_template_formatting_mistral():
     mt = MessageTemplate(role=Role.AI, content="Hello, {name}!")
-    assert mt.format(syntax="mistral",name="John") == MistralChatMessage(role=Role.AI.mistral, content="Hello, John!")
+    assert mt.format(syntax="mistral",name="John") == {"role" : Role.AI.mistral, "content" : "Hello, John!"}
 
 def test_chatprompt_template_formatting_cadenai():
     messages = [
@@ -105,10 +103,10 @@ def test_chatprompt_template_formatting_mistral_output():
 
     formatted = cpt.format(syntax="mistral", name="Bot", user_input="Tell me more about AI",openai_format=True)
     expected = [
-        MistralChatMessage(role=Role.SYSTEM.mistral, content="You are a helpful AI bot. Your name is Bot."),
-        MistralChatMessage(role=Role.HUMAN.mistral, content="Hello, how are you doing?"),
-        MistralChatMessage(role=Role.AI.mistral, content="I'm doing well, thanks!"),
-        MistralChatMessage(role=Role.HUMAN.mistral, content="Tell me more about AI")
+        {"role" : Role.SYSTEM.mistral, "content" : "You are a helpful AI bot. Your name is Bot."},
+        {"role" : Role.HUMAN.mistral, "content" : "Hello, how are you doing?"},
+        {"role" : Role.AI.mistral, "content" : "I'm doing well, thanks!"},
+        {"role" : Role.HUMAN.mistral, "content" : "Tell me more about AI"}
     ]
     assert formatted == expected
 
